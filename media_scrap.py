@@ -202,38 +202,42 @@ for i,medium in enumerate(media):
     if content['validFeed'] == True:
         storiesRSS = content['soup'].findAll(content['feedElement'])
         for storyRSS in storiesRSS:
-            url = storyRSS.find('link').get_text()
-            if url == '' or url is None:
-                try:
-                    url = storyRSS.find('link').get('href')
-                except:
-                    medium['validFeed'] = False
             try:
-                date_string = storyRSS.find(content['feedDateElement']).get_text()
-                date = parse(date_string, ignoretz= True)
-                week = str(date.isocalendar()[0]) + '.' + str(date.isocalendar()[1])
-                month = str(date.isocalendar()[0]) + '.'+ str(date.month)
-            except:
-                print('Could not find a valid date in RSS feed for story:', url)
-                medium['validFeed'] = False
-            if medium['validFeed'] == True:
-                if url not in existing_url:
-                    print('')
-                    print('New story found:')
-                    print(url)
+                url = storyRSS.find('link').get_text()
+                if url == '' or url is None:
                     try:
-                        description = storyRSS.find(content['feedDescElement']).get_text()
+                        url = storyRSS.find('link').get('href')
                     except:
-                        description = '' 
-                    story = {
-                        'title': storyRSS.find('title').get_text(),
-                        'description': description,
-                        'link': url,
-                        'date': str(date),
-                        'week': week,
-                        'month': month
-                    }
-                    medium['stories'].append(story)
+                        medium['validFeed'] = False
+                try:
+                    date_string = storyRSS.find(content['feedDateElement']).get_text()
+                    date = parse(date_string, ignoretz= True)
+                    week = str(date.isocalendar()[0]) + '.' + str(date.isocalendar()[1])
+                    month = str(date.isocalendar()[0]) + '.'+ str(date.month)
+                except:
+                    print('Could not find a valid date in RSS feed for story:', url)
+                    medium['validFeed'] = False
+                if medium['validFeed'] == True:
+                    if url not in existing_url:
+                        print('')
+                        print('New story found:')
+                        print(url)
+                        try:
+                            description = storyRSS.find(content['feedDescElement']).get_text()
+                        except:
+                            description = '' 
+                        story = {
+                            'title': storyRSS.find('title').get_text(),
+                            'description': description,
+                            'link': url,
+                            'date': str(date),
+                            'week': week,
+                            'month': month
+                        }
+                        medium['stories'].append(story)
+            except:
+                print('Hmmm, problem found with this story:')
+                print(storyRSS)
     else:
         medium['validFeed'] = False
     
